@@ -1,3 +1,5 @@
+#[cfg(feature = "serde")]
+extern crate serde;
 
 use std::hash::{BuildHasher,Hash};
 use std::collections::hash_map::RandomState;
@@ -5,6 +7,10 @@ use super::ValueVec;
 use super::ASMS;
 use super::hashing::HashIter;
 
+#[cfg(feature = "serde")]
+use self::serde::{Serialize, Deserialize};
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 /// A standard counting bloom filter that uses a fixed number of bits
 /// per counter, supports remove, and estimating the count of the
 /// number of items inserted.

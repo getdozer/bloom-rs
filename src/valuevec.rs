@@ -15,9 +15,15 @@
 
 extern crate core;
 extern crate bit_vec;
+#[cfg(feature = "serde")]
+extern crate serde;
 
 use bit_vec::BitVec;
 
+#[cfg(feature = "serde")]
+use self::serde::{Serialize, Deserialize};
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 /// A ValueVec is a bit vector that holds fixed sized unsigned integer
 /// values.
 pub struct ValueVec {
