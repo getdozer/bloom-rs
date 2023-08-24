@@ -21,7 +21,7 @@ use std::cmp::{min,max};
 use std::collections::hash_map::RandomState;
 use std::hash::{BuildHasher,Hash};
 
-use super::{ASMS,Intersectable,Unionable};
+use super::ASMS;
 use super::hashing::HashIter;
 
 /// A standard BloomFilter.  If an item is instered then `contains`
@@ -181,35 +181,6 @@ impl<R,S> ASMS for BloomFilter<R,S>
     }
 }
 
-impl Intersectable for BloomFilter {
-    /// Calculates the intersection of two BloomFilters.  Only items inserted into both filters will still be present in `self`.
-    ///
-    /// Both BloomFilters must be using the same number of
-    /// bits. Returns true if self changed.
-    ///
-    /// # Panics
-    /// Panics if the BloomFilters are not using the same number of bits
-    fn intersect(&mut self, other: &BloomFilter) -> bool {
-        self.bits.intersect(&other.bits)
-    }
-}
-
-
-impl Unionable for BloomFilter {
-    /// Calculates the union of two BloomFilters.  Items inserted into
-    /// either filters will be present in `self`.
-    ///
-    /// Both BloomFilters must be using the same number of
-    /// bits. Returns true if self changed.
-    ///
-    /// # Panics
-    /// Panics if the BloomFilters are not using the same number of bits
-    fn union(&mut self, other: &BloomFilter) -> bool {
-        self.bits.union(&other.bits)
-    }
-}
-
-
 /// Return the optimal number of hashes to use for the given number of
 /// bits and items in a filter
 pub fn optimal_num_hashes(num_bits: usize, num_items: u32) -> u32 {
@@ -283,7 +254,7 @@ mod tests {
     use std::collections::HashSet;
     use bloom::rand::{self,Rng};
     use super::{BloomFilter,needed_bits,optimal_num_hashes};
-    use {ASMS,Intersectable,Unionable};
+    use ASMS;
 
     #[test]
     fn simple() {
@@ -293,33 +264,6 @@ mod tests {
         assert!(!b.contains(&2));
         b.clear();
         assert!(!b.contains(&1));
-    }
-
-    #[test]
-    fn intersect() {
-        let mut b1:BloomFilter = BloomFilter::with_rate(0.01,20);
-        b1.insert(&1);
-        b1.insert(&2);
-        let mut b2:BloomFilter = BloomFilter::with_rate(0.01,20);
-        b2.insert(&1);
-
-        b1.intersect(&b2);
-
-        assert!(b1.contains(&1));
-        assert!(!b1.contains(&2));
-    }
-
-    #[test]
-    fn union() {
-        let mut b1:BloomFilter = BloomFilter::with_rate(0.01,20);
-        b1.insert(&1);
-        let mut b2:BloomFilter = BloomFilter::with_rate(0.01,20);
-        b2.insert(&2);
-
-        b1.union(&b2);
-
-        assert!(b1.contains(&1));
-        assert!(b1.contains(&2));
     }
 
     #[test]
